@@ -35,7 +35,7 @@ try {
     }
     
     $topStreams = $db->query("
-        SELECT s.stream_display_name as name, COUNT(la.id) as views
+        SELECT s.stream_display_name as name, COUNT(la.activity_id) as views
         FROM streams s
         LEFT JOIN lines_activity la ON s.id = la.stream_id
         WHERE la.date_start >= " . (time() - 86400) . "
