@@ -1,7 +1,7 @@
 const API_URL = 'api/';
 
 if (!localStorage.getItem('token')) {
-    window.location.href = 'https://algoritimo.site/auth.html';
+    window.location.href = 'auth.html';
 }
 
 const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -10,7 +10,7 @@ document.getElementById('userName').textContent = user.username || 'Admin';
 document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = 'https://algoritimo.site/auth.html';
+    window.location.href = 'auth.html';
 });
 
 const navItems = document.querySelectorAll('.nav-item');
@@ -650,7 +650,7 @@ async function apiRequest(endpoint, options = {}) {
     if (response.status === 401) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = 'https://algoritimo.site/auth.html';
+        window.location.href = 'auth.html';
         return;
     }
     
