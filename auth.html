@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Painel IPTV Office</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="glass-effect rounded-2xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <div class="inline-block p-4 bg-white/20 rounded-full mb-4">
+                    <i class="fas fa-tv text-5xl text-white"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">Painel IPTV Office</h1>
+                <p class="text-white/80">Sistema de Gerenciamento</p>
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-white/90 text-sm font-medium mb-2" for="username">
+                        <i class="fas fa-user mr-2"></i>Usuário
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username"
+                        class="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+                        placeholder="Digite seu usuário"
+                        required
+                    >
+                </div>
+
+                <div>
+                    <label class="block text-white/90 text-sm font-medium mb-2" for="password">
+                        <i class="fas fa-lock mr-2"></i>Senha
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password"
+                            class="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition"
+                            placeholder="Digite sua senha"
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            id="togglePassword"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition"
+                        >
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center text-white/80 text-sm cursor-pointer">
+                        <input type="checkbox" id="remember" class="mr-2 rounded">
+                        Lembrar-me
+                    </label>
+                    <a href="#" class="text-white/80 text-sm hover:text-white transition">
+                        Esqueceu a senha?
+                    </a>
+                </div>
+
+                <button 
+                    type="submit"
+                    class="w-full bg-white text-purple-600 font-semibold py-3 rounded-lg hover:bg-white/90 transition transform hover:scale-105 shadow-lg"
+                >
+                    <i class="fas fa-sign-in-alt mr-2"></i>Entrar
+                </button>
+            </form>
+
+            <div id="errorMessage" class="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-white text-sm hidden">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span id="errorText"></span>
+            </div>
+        </div>
+
+        <p class="text-center text-white/60 text-sm mt-6">
+            © 2024 IPTV Office. Todos os direitos reservados.
+        </p>
+    </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const passwordValue = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+
+            try {
+                const response = await fetch('api/auth.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: passwordValue,
+                        remember: remember
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    errorMessage.classList.remove('hidden');
+                    errorText.textContent = data.message || 'Usuário ou senha inválidos';
+                }
+            } catch (error) {
+                errorMessage.classList.remove('hidden');
+                errorText.textContent = 'Erro ao conectar com o servidor';
+            }
+        });
+
+        if (localStorage.getItem('token')) {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
